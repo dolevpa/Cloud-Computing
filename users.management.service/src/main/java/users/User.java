@@ -3,11 +3,16 @@ package users;
 import java.time.LocalDate;
 import java.util.Arrays;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class User {
 
 	private String email;
 	private Name name;
+	
+	@JsonIgnore
 	private String password;
+	
 	private LocalDate birthdate;
 	private String[] roles;
 	

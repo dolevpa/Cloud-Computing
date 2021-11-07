@@ -2,7 +2,7 @@ package users;
 
 import java.time.LocalDate;
 
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,16 +14,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserController {
 
+	private UserService userService;
+	
+	@Autowired
+	public UserController(UserService userService) {
+		super();
+		this.userService = userService;
+	}
 	@RequestMapping(path = "/users", method = RequestMethod.POST,
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public User store(@RequestBody User newUser) {
-		return newUser;
+		return this.userService.store(newUser);
 	}
 
 	@RequestMapping(path = "/users/{email}", method = RequestMethod.GET,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public User exportAllUsers(@PathVariable("email") String email) {
+	public User userByEmail(@PathVariable("email") String email) {
 		User rvUser = new User();
 		Name name = new Name();
 		name.setFirst("Stav");
@@ -87,11 +94,12 @@ public class UserController {
 	}
 	
 	@RequestMapping(
-			path = "/users/search?criteriaType=byEmailDomain&criteriaValue={value}&size={size}&page={page}&sortBy={sortAttribute}&sortOrder={order}",
+			//?criteriaType=byEmailDomain&criteriaValue={value}&size={size}&page={page}&sortBy={sortAttribute}&sortOrder={order}
+			path = "/users/search/byEmailDomain",
 			method = RequestMethod.GET,
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public User[] getDomainSortedUsers(
-			@RequestParam(name="criteriaType", required = false, defaultValue = "byEmailDomain") String criteriaType,
+//			@RequestParam(name="criteriaType", required = false, defaultValue = "byEmailDomain") String criteriaType,
 			@RequestParam(name="criteriaValue", required = false, defaultValue = "gmail.com") String value,
 			@RequestParam(name="size", required = false, defaultValue = "20") int size,
 			@RequestParam(name="page", required = false, defaultValue = "0") int page,
@@ -102,7 +110,8 @@ public class UserController {
 	
 	
 	@RequestMapping(
-			path = " /users/search?criteriaType=byBirthYear&criteriaValue={value}&size={size}&page={page}&sortBy={sortAttribute}&sortOrder={order}",
+			//?criteriaType=byBirthYear&criteriaValue={value}&size={size}&page={page}&sortBy={sortAttribute}&sortOrder={order}
+			path = "/users/search/byBirthYear",
 			method = RequestMethod.GET,
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public User[] getYearSortedUsers(
