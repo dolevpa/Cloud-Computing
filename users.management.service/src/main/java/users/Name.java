@@ -2,32 +2,37 @@ package users;
 
 public class Name {
 
-	private String first;
-	private String last;
+    private String first;
+    private String last;
 
-	public Name() {
+    public Name() {
 
-	}
+    }
 
-	public String getFirst() {
-		return first;
-	}
+    public Name(String firstName, String lastName) {
+        this.first = firstName;
+        this.last = lastName;
+    }
 
-	public void setFirst(String first) {
-		this.first = first;
-	}
+    public String getFirst() {
+        return first;
+    }
 
-	public String getLast() {
-		return last;
-	}
+    public void setFirst(String first) {
+        this.first = first;
+    }
 
-	public void setLast(String last) {
-		this.last = last;
-	}
+    public String getLast() {
+        return last;
+    }
 
-	@Override
-	public String toString() {
-		return "Name [first=" + first + ", last=" + last + "]";
-	}
+    public void setLast(String last) {
+        this.last = last;
+    }
+
+    @Override
+    public String toString() {
+        return "Name [first=" + first + ", last=" + last + "]";
+    }
 
 }

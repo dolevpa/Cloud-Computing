@@ -24,7 +24,7 @@ public class UserController {
 	@RequestMapping(path = "/users", method = RequestMethod.POST,
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public User store(@RequestBody User newUser) {
+	public User store(@RequestBody NewDetailsUser newUser) {
 		return this.userService.store(newUser);
 	}
 
@@ -41,7 +41,8 @@ public class UserController {
 		String[] roles = { "admin", "devs", "inspector" };
 		rvUser.setRoles(roles);
 		rvUser.setEmail(email);
-		return rvUser;
+		User user = userService.getUserByEmail(email);
+		return user;
 	}
 	
 	@RequestMapping(path = "/users/login/{email}", method = RequestMethod.GET,

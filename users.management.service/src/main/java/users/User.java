@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+
 public class User {
 
 	private String email;
@@ -15,7 +16,15 @@ public class User {
 	
 	private LocalDate birthdate;
 	private String[] roles;
-	
+
+	public User(String email, Name name, String password, LocalDate birthdate, String[] roles) {
+		this.email = email;
+		this.name = name;
+		this.password = password;
+		this.birthdate = birthdate;
+		this.roles = roles;
+	}
+
 	public User() {
 	}
 
@@ -64,6 +73,6 @@ public class User {
 		return "User [email=" + email + ", name=" + name + ", password=" + password + ", birthdate=" + birthdate
 				+ ", roles=" + Arrays.toString(roles) + "]";
 	}
-	
-	
+
+
 }

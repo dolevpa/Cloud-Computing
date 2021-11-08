@@ -4,7 +4,8 @@ import java.util.List;
 
 public interface UserService {
 
-	public User store(User newUser);
+//get a new user details, save in db and create a new user object
+	public User store(NewDetailsUser newUser);
 
 	public User getUserByEmail(String email);
 
