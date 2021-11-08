@@ -1,6 +1,6 @@
 package users;
 
-import java.time.LocalDate;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -24,25 +24,15 @@ public class UserController {
 	@RequestMapping(path = "/users", method = RequestMethod.POST,
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public User store(@RequestBody NewDetailsUser newUser) {
+	public User store(@RequestBody User newUser) {
 		return this.userService.store(newUser);
 	}
 
 	@RequestMapping(path = "/users/{email}", method = RequestMethod.GET,
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public User userByEmail(@PathVariable("email") String email) {
-		User rvUser = new User();
-		Name name = new Name();
-		name.setFirst("Stav");
-		name.setLast("Finz");
-		rvUser.setName(name);
-		rvUser.setBirthdate(LocalDate.now());
-		rvUser.setPassword("ab4de");
-		String[] roles = { "admin", "devs", "inspector" };
-		rvUser.setRoles(roles);
-		rvUser.setEmail(email);
-		User user = userService.getUserByEmail(email);
-		return user;
+;
+		return this.userService.getUserByEmail(email);
 	}
 	
 	@RequestMapping(path = "/users/login/{email}", method = RequestMethod.GET,
@@ -50,27 +40,15 @@ public class UserController {
 	public User loginUser(
 			@PathVariable("email") String email,
 			@RequestParam(name="password", required = false) String password) {
-		User rvUser = new User();
-		Name name = new Name();
-		name.setFirst("Stav");
-		name.setLast("Finz");
-		rvUser.setName(name);
-		rvUser.setBirthdate(LocalDate.now());
-		if(password ==null)
-			rvUser.setPassword("ab4de");
-		else
-			rvUser.setPassword(password);
-		String[] roles = { "admin", "devs", "inspector" };
-		rvUser.setRoles(roles);
-		rvUser.setEmail(email);
-		return rvUser;
+		return this.userService.loginUserWithPassword(email, password);
 	}
 	
 	@RequestMapping(path = "/users/{email}", method = RequestMethod.PUT,
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public void updateUser(
 			@PathVariable("email") String email,
-			@RequestBody User newUser) {
+			@RequestBody NewDetailsUser details) {
+		this.userService.updateUser(email, details);
 
 	}
 	
@@ -78,7 +56,7 @@ public class UserController {
 			path = "/users",
 			method = RequestMethod.DELETE)
 	public void deleteAllUsersInSpace() {
-	
+		this.userService.deleteAllUsers();
 	}
 	
 	@RequestMapping(
@@ -90,8 +68,8 @@ public class UserController {
 			@RequestParam(name="page", required = false, defaultValue = "0") int page,
 			@RequestParam(name="sortBy", required = false, defaultValue = "email") String sortAttribute,
 			@RequestParam(name="sortOrder", required = false, defaultValue = "ASC") String order){
-		User [] rvUsers = new User[0];
-		return rvUsers;
+		
+		return this.userService.getSortedUsers(size, page, sortAttribute, order).toArray(new User[0]);
 	}
 	
 	@RequestMapping(
@@ -106,7 +84,7 @@ public class UserController {
 			@RequestParam(name="page", required = false, defaultValue = "0") int page,
 			@RequestParam(name="sortBy", required = false, defaultValue = "email") String sortAttribute,
 			@RequestParam(name="sortOrder", required = false, defaultValue = "ASC") String order){
-		return new User[0];
+		return this.userService.getSortedUsersSameDomain(value, size, page, sortAttribute, order).toArray(new User[0]);
 	}
 	
 	
@@ -121,7 +99,7 @@ public class UserController {
 			@RequestParam(name="page", required = false, defaultValue = "0") int page,
 			@RequestParam(name="sortBy", required = false, defaultValue = "email") String sortAttribute,
 			@RequestParam(name="sortOrder", required = false, defaultValue = "ASC") String order){
-		return new User[0];
+		return this.userService.getSortedUsersSameBirthYear(value, size, page, sortAttribute, order).toArray(new User[0]);
 	}
 	
 	

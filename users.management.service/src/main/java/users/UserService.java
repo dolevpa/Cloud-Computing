@@ -4,8 +4,7 @@ import java.util.List;
 
 public interface UserService {
 
-//get a new user details, save in db and create a new user object
-	public User store(NewDetailsUser newUser);
+	public User store(User newUser);
 
 	public User getUserByEmail(String email);
 
@@ -22,5 +21,9 @@ public interface UserService {
 
 	public List<User> getSortedUsersSameBirthYear(String value, int size, int page, String sortAtrribute,
 			String sortOrder);
+	
+	public UserEntity toEntity(User user);
+	
+	public User toBoundary(UserEntity user);
 
 }

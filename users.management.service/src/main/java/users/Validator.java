@@ -8,8 +8,12 @@ public interface Validator {
 	
 	public boolean isValidEmailAddress(String email);//Checking if email address is written by rules
 	
-	public boolean isValidString(String str);//Checking if string isn't empty ---> firstName/lastName/Role
+	public boolean isValidName(String str);//Checking if string isn't empty ---> firstName/lastName
 	
-	public LocalDate isValidBirthDate(String date);//Checking if date is written by rules ---> if good, returns as LocalDate, not good will return null
+	public boolean isValidRole(String role);
+	
+	public boolean isValidBirthDate(LocalDate date);//Checking if date is written by rules ---> if good, returns as LocalDate, not good will return null
+	
+	public boolean isValidUser(User user);
 	
 }
