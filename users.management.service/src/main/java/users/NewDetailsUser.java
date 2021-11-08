@@ -4,6 +4,7 @@ package users;
 import java.util.Arrays;
 
 public class NewDetailsUser {
+	
 	private String firstName;
 	private String lastName;
 	private String password;

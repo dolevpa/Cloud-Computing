@@ -2,6 +2,7 @@ package users;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
@@ -13,17 +14,28 @@ import javax.persistence.TemporalType;
 @Table(name="USER_TBL")
 public class UserEntity {
 	
-	
+	private String email;
 	private String firstName;
 	private String lastName;
-	private String email;
 	private Date birthDate;
-	private String[] roles;
+	private String roles;
 	private String password;
+	
+	
 	
 	public UserEntity() {
 	}
 
+	@Id
+	@Column(name = "email")
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	
 	public String getFirstName() {
 		return firstName;
 	}
@@ -40,14 +52,7 @@ public class UserEntity {
 		this.lastName = lastName;
 	}
 	
-	@Id
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
+	
 	
 	@Temporal(TemporalType.DATE)
 	public Date getBirthDate() {
@@ -59,11 +64,11 @@ public class UserEntity {
 	}
 	
 	@Lob
-	public String[] getRoles() {
+	public String getRoles() {
 		return roles;
 	}
 
-	public void setRoles(String[] roles) {
+	public void setRoles(String roles) {
 		this.roles = roles;
 	}
 

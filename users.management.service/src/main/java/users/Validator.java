@@ -12,8 +12,9 @@ public interface Validator {
 	
 	public boolean isValidRole(String role);
 	
-	public boolean isValidBirthDate(LocalDate date);//Checking if date is written by rules ---> if good, returns as LocalDate, not good will return null
+	public boolean isValidBirthDateFormat(String inputStringDate);//Checking if date is written by rules ---> if good, returns as LocalDate, not good will return null
 	
+	public boolean isValidBirthDateRange(LocalDate date);
 	public boolean isValidUser(User user);
 	
 }

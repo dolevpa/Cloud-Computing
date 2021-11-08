@@ -47,8 +47,8 @@ public class UserController {
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public void updateUser(
 			@PathVariable("email") String email,
-			@RequestBody NewDetailsUser details) {
-		this.userService.updateUser(email, details);
+			@RequestBody User userToUpdate) {
+		this.userService.updateUser(email, userToUpdate);
 
 	}
 	
@@ -64,43 +64,45 @@ public class UserController {
 			method = RequestMethod.GET,
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public User[] getSortedUsers(
-			@RequestParam(name="size", required = false, defaultValue = "20") int size,
-			@RequestParam(name="page", required = false, defaultValue = "0") int page,
-			@RequestParam(name="sortBy", required = false, defaultValue = "email") String sortAttribute,
-			@RequestParam(name="sortOrder", required = false, defaultValue = "ASC") String order){
-		
-		return this.userService.getSortedUsers(size, page, sortAttribute, order).toArray(new User[0]);
-	}
-	
-	@RequestMapping(
-			//?criteriaType=byEmailDomain&criteriaValue={value}&size={size}&page={page}&sortBy={sortAttribute}&sortOrder={order}
-			path = "/users/search/byEmailDomain",
-			method = RequestMethod.GET,
-			produces = MediaType.APPLICATION_JSON_VALUE)
-	public User[] getDomainSortedUsers(
-//			@RequestParam(name="criteriaType", required = false, defaultValue = "byEmailDomain") String criteriaType,
-			@RequestParam(name="criteriaValue", required = false, defaultValue = "gmail.com") String value,
-			@RequestParam(name="size", required = false, defaultValue = "20") int size,
-			@RequestParam(name="page", required = false, defaultValue = "0") int page,
-			@RequestParam(name="sortBy", required = false, defaultValue = "email") String sortAttribute,
-			@RequestParam(name="sortOrder", required = false, defaultValue = "ASC") String order){
-		return this.userService.getSortedUsersSameDomain(value, size, page, sortAttribute, order).toArray(new User[0]);
-	}
-	
-	
-	@RequestMapping(
-			//?criteriaType=byBirthYear&criteriaValue={value}&size={size}&page={page}&sortBy={sortAttribute}&sortOrder={order}
-			path = "/users/search/byBirthYear",
-			method = RequestMethod.GET,
-			produces = MediaType.APPLICATION_JSON_VALUE)
-	public User[] getYearSortedUsers(
+			@RequestParam(name="criteriaType", required = false) String criteriaType,
 			@RequestParam(name="criteriaValue", required = false) String value,
 			@RequestParam(name="size", required = false, defaultValue = "20") int size,
 			@RequestParam(name="page", required = false, defaultValue = "0") int page,
 			@RequestParam(name="sortBy", required = false, defaultValue = "email") String sortAttribute,
 			@RequestParam(name="sortOrder", required = false, defaultValue = "ASC") String order){
-		return this.userService.getSortedUsersSameBirthYear(value, size, page, sortAttribute, order).toArray(new User[0]);
+		
+		return this.userService.getSortedUsers(criteriaType,value,size, page, sortAttribute, order).toArray(new User[0]);
 	}
+	
+//	@RequestMapping(
+//			path = "/users/search",
+//			method = RequestMethod.GET,
+//			produces = MediaType.APPLICATION_JSON_VALUE)
+//	public User[] getDomainSortedUsers(
+//			@RequestParam(name="criteriaType", required = false) String criteriaType,
+//			@RequestParam(name="criteriaValue", required = false) String value,
+//			@RequestParam(name="size", required = false, defaultValue = "20") int size,
+//			@RequestParam(name="page", required = false, defaultValue = "0") int page,
+//			@RequestParam(name="sortBy", required = false, defaultValue = "email") String sortAttribute,
+//			@RequestParam(name="sortOrder", required = false, defaultValue = "ASC") String order){
+//		return this.userService.getSortedUsersSameDomain(criteriaType,value, size, page, sortAttribute, order).toArray(new User[0]);
+//	}
+	
+	
+//	@RequestMapping(
+//			//?criteriaType=byBirthYear&criteriaValue={value}&size={size}&page={page}&sortBy={sortAttribute}&sortOrder={order}
+//			path = "/users/search",
+//			method = RequestMethod.GET,
+//			produces = MediaType.APPLICATION_JSON_VALUE)
+//	public User[] getYearSortedUsers(
+//			@RequestParam(name="criteriaType", required = false) String criteriaType,
+//			@RequestParam(name="criteriaValue", required = false) String value,
+//			@RequestParam(name="size", required = false, defaultValue = "20") int size,
+//			@RequestParam(name="page", required = false, defaultValue = "0") int page,
+//			@RequestParam(name="sortBy", required = false, defaultValue = "email") String sortAttribute,
+//			@RequestParam(name="sortOrder", required = false, defaultValue = "ASC") String order){
+//		return this.userService.getSortedUsersSameBirthYear(criteriaType,value, size, page, sortAttribute, order).toArray(new User[0]);
+//	}
 	
 	
 	

@@ -1,19 +1,19 @@
 package users;
 
-import java.time.LocalDate;
+
 import java.util.Arrays;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 public class User {
 
 	private String email;
 	private Name name;
 	
-	@JsonIgnore
+	
 	private String password;
 	
-	private LocalDate birthdate;
+	private String birthdate;
 	private String[] roles;
 	
 	public User() {
@@ -43,11 +43,11 @@ public class User {
 		this.password = password;
 	}
 
-	public LocalDate getBirthdate() {
+	public String getBirthdate() {
 		return birthdate;
 	}
 
-	public void setBirthdate(LocalDate birthdate) {
+	public void setBirthdate(String birthdate) {
 		this.birthdate = birthdate;
 	}
 
