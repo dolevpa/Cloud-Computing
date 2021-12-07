@@ -1,6 +1,8 @@
 package shoppingCatalog.Logic;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Flux;
@@ -105,34 +107,56 @@ public class MongoShoppingCatalog implements ShoppingCatalogService {
 
 		return Flux.just(helper)
 				.flatMap(boundary ->{
-					
 					if(!this.validator.isValidFilterType(filterType)) {
 						return Flux.error(() -> new InvalidFilterTypeException("Filter type must be byName/byMinPrice/byMaxPrice/byCategoryName"));}
 					else {
 						if(!this.validator.isValidSortAttribute(sortAttribute)) {
-							Flux.error(() -> new InvalidSortAttributeException("Sort Attribute must be id/name/price/image/category"));
+							return Flux.error(() -> new InvalidSortAttributeException("Sort Attribute must be id/name/price/image/category"));
 						}else {
 							if(!this.validator.isValidOrder(order))
-								Flux.error(() -> new InvalidOrderException("Order must be ASC/DESC"));
+								return Flux.error(() -> new InvalidOrderException("Order must be ASC/DESC"));
 						}
 						switch (filterType) {
 							case "byName":
+								return this.shoppingCatalogDao.findAllByName(
+										value,
+										Sort.by(order.equals("ASC")?Direction.ASC:Direction.DESC,sortAttribute,"id"))
+										.map(this::toBoundary)
+										.log();
 								
-								break;
 							case "byMinPrice":
+								if(!this.validator.isValidPrice(value))
+									return Flux.error(() -> new InvalidPriceException("Price must be number greater then 0"));
+								else {
+									return this.shoppingCatalogDao.
+											findAllByPriceEqualOrBigger(
+											Double.parseDouble(value),
+											Sort.by(order.equals("ASC")?Direction.ASC:Direction.DESC,sortAttribute,"id"))//Flux<ProductEntity>
+											.map(this::toBoundary)//Flux<Product>
+											.log();//Flux<Product>
+								}
 								
-								break;
 							case "byMaxPrice":
-								
-								break;
+								if(!this.validator.isValidPrice(value))
+									return Flux.error(() -> new InvalidPriceException("Price must be number greater then 0"));
+								else {
+									return this.shoppingCatalogDao.
+											findAllByPriceEqualOrSmaller(
+											Double.parseDouble(value),
+											Sort.by(order.equals("ASC")?Direction.ASC:Direction.DESC,sortAttribute,"id"))//Flux<ProductEntity>
+											.map(this::toBoundary)//Flux<Product>
+											.log();//Flux<Product>
+								}
 							case "byCategoryName":
-								
-								break;
+								return this.shoppingCatalogDao.findAllByCategoryLike(
+										value,
+										Sort.by(order.equals("ASC")?Direction.ASC:Direction.DESC,sortAttribute,"id"))
+										.map(this::toBoundary)//Flux<Product>
+										.log();//Flux<Product>
+							default:
+								return Flux.empty();		
 						}
 					}
-					return this.shoppingCatalogDao.findAll()
-							.map(this::toBoundary)
-							.log();
 				});
 	}
 
