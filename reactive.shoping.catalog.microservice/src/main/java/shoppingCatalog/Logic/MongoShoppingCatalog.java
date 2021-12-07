@@ -15,12 +15,12 @@ import shoppingCatalog.Exceptions.*;
 public class MongoShoppingCatalog implements ShoppingCatalogService {
 
 	private Validator validator;
-	private ShoppingCatalogDao shoppingCatalogDao;
+	private DaoShoppingCatalog daoShoppingCatalog;
 	
 	@Autowired
-	public MongoShoppingCatalog(ShoppingCatalogDao shoppingCatalogDao,Validator validator) {
+	public MongoShoppingCatalog(DaoShoppingCatalog daoShoppingCatalog,Validator validator) {
 		super();
-		this.shoppingCatalogDao = shoppingCatalogDao;
+		this.daoShoppingCatalog = daoShoppingCatalog;
 		this.validator=validator;
 	}
 	@Override
@@ -30,7 +30,7 @@ public class MongoShoppingCatalog implements ShoppingCatalogService {
 					if(!this.validator.isValidProduct(boundary))
 						return Mono.error(()-> new ProductInvalidException("Invalid Product input"));
 					else {
-						return this.shoppingCatalogDao
+						return this.daoShoppingCatalog
 						.findById(boundary.getId())//Mono<ProductEntity>
 						.flatMap(entity ->{
 							return Mono.error(()-> new ProductAlreadyExistException("Product already exist"));
@@ -39,7 +39,7 @@ public class MongoShoppingCatalog implements ShoppingCatalogService {
 								Mono.defer(() ->{
 									return Mono.just(boundary)
 											.map(this::toEntity)
-											.flatMap(entity-> this.shoppingCatalogDao.save(entity))
+											.flatMap(entity-> this.daoShoppingCatalog.save(entity))
 											.map(this::toBoundary);
 								}))//Mono<Object>
 						.cast(Product.class);//Mono<Product>
@@ -57,9 +57,9 @@ public class MongoShoppingCatalog implements ShoppingCatalogService {
 		return Mono.just(productToCheck)
 				.flatMap(boundary ->{
 					if(!this.validator.isValidId(productToCheck.getId()))
-						return Mono.error(() -> new ProductIsNotExistException("Product isn't exists "+productId));
+						return Mono.error(() -> new InvalidIdException("Id must be at least 3 characters long, and at least 1 digit!"));
 					else {
-						return 	this.shoppingCatalogDao.
+						return 	this.daoShoppingCatalog.
 								findById(productId)
 								.switchIfEmpty(Mono.error(() -> new ProductIsNotExistException("Product isn't exists "+productId)))// Mono<ProductEntity>
 								.map(this::toBoundary) // Mono<Product>
@@ -72,11 +72,11 @@ public class MongoShoppingCatalog implements ShoppingCatalogService {
 
 	@Override
 	public Mono<Void> deleteAllShoppingCatalog() {
-		return this.shoppingCatalogDao
+		return this.daoShoppingCatalog
 				.deleteAll();
 	}
 
-	public Product toBoundary(ProductEntity entity) {
+	public Product toBoundary(EntityProduct entity) {
 		Product rv = new Product();
 
 		rv.setId(entity.getId());
@@ -89,8 +89,8 @@ public class MongoShoppingCatalog implements ShoppingCatalogService {
 		return rv;
 	}
 
-	public ProductEntity toEntity(Product boundary) {
-		ProductEntity rv = new ProductEntity();
+	public EntityProduct toEntity(Product boundary) {
+		EntityProduct rv = new EntityProduct();
 
 		rv.setId(boundary.getId());
 		rv.setName(boundary.getName());
@@ -116,9 +116,15 @@ public class MongoShoppingCatalog implements ShoppingCatalogService {
 							if(!this.validator.isValidOrder(order))
 								return Flux.error(() -> new InvalidOrderException("Order must be ASC/DESC"));
 						}
+						if(filterType ==null) {
+							return this.daoShoppingCatalog.findAll(
+									Sort.by(order.equals("ASC") ? Direction.ASC : Direction.DESC, sortAttribute, "id"))
+                                    .map(this::toBoundary)
+                                    .log();
+						}
 						switch (filterType) {
 							case "byName":
-								return this.shoppingCatalogDao.findAllByName(
+								return this.daoShoppingCatalog.findAllByName(
 										value,
 										Sort.by(order.equals("ASC")?Direction.ASC:Direction.DESC,sortAttribute,"id"))
 										.map(this::toBoundary)
@@ -128,8 +134,8 @@ public class MongoShoppingCatalog implements ShoppingCatalogService {
 								if(!this.validator.isValidPrice(value))
 									return Flux.error(() -> new InvalidPriceException("Price must be number greater then 0"));
 								else {
-									return this.shoppingCatalogDao.
-											findAllByPriceEqualOrBigger(
+									return this.daoShoppingCatalog.
+											findAllByPriceEqualsOrPriceGreaterThan(
 											Double.parseDouble(value),
 											Sort.by(order.equals("ASC")?Direction.ASC:Direction.DESC,sortAttribute,"id"))//Flux<ProductEntity>
 											.map(this::toBoundary)//Flux<Product>
@@ -140,21 +146,25 @@ public class MongoShoppingCatalog implements ShoppingCatalogService {
 								if(!this.validator.isValidPrice(value))
 									return Flux.error(() -> new InvalidPriceException("Price must be number greater then 0"));
 								else {
-									return this.shoppingCatalogDao.
-											findAllByPriceEqualOrSmaller(
+									return this.daoShoppingCatalog.
+											findAllByPriceEqualsOrPriceLessThan(
 											Double.parseDouble(value),
 											Sort.by(order.equals("ASC")?Direction.ASC:Direction.DESC,sortAttribute,"id"))//Flux<ProductEntity>
 											.map(this::toBoundary)//Flux<Product>
 											.log();//Flux<Product>
 								}
 							case "byCategoryName":
-								return this.shoppingCatalogDao.findAllByCategoryLike(
+								return this.daoShoppingCatalog.findAllByCategoryLike(
 										value,
 										Sort.by(order.equals("ASC")?Direction.ASC:Direction.DESC,sortAttribute,"id"))
 										.map(this::toBoundary)//Flux<Product>
 										.log();//Flux<Product>
 							default:
-								return Flux.empty();		
+								return this.daoShoppingCatalog.findAll(
+										Sort.by(order.equals("ASC") ? Direction.ASC : Direction.DESC, sortAttribute, "id"))
+	                                    .map(this::toBoundary)
+	                                    .log();
+		
 						}
 					}
 				});

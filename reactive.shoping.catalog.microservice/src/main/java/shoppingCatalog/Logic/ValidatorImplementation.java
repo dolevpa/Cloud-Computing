@@ -12,6 +12,7 @@ import shoppingCatalog.Boundary.Product;
 @Component
 public class ValidatorImplementation implements Validator {
 
+
 	@Override
 	public boolean isValidId(String id) {
 
