@@ -10,7 +10,7 @@ public interface Validator {
 	
 	public boolean isValidName(String name);
 	
-	public boolean isValidPrice(double price);
+	public boolean isValidPrice(String price);
 	
 	public boolean isValidImage(String image);
 	
@@ -19,5 +19,11 @@ public interface Validator {
 	public boolean isValidCategory(String category);
 	
 	public boolean isValidProduct(Product product);
+	
+	public boolean isValidFilterType(String filterType);
+	
+	public boolean isValidSortAttribute(String sortAttribute);
+	
+	public boolean isValidOrder(String order);
 
 }

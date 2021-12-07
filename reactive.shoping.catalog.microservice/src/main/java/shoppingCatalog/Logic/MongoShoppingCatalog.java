@@ -6,11 +6,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import shoppingCatalog.Boundary.Product;
-import shoppingCatalog.Data.ProductEntity;
-import shoppingCatalog.Data.ShoppingCatalogDao;
-import shoppingCatalog.Exceptions.ProductAlreadyExistException;
-import shoppingCatalog.Exceptions.ProductIsNotExistException;
-import shoppingCatalog.Exceptions.ProductInvalidException;
+import shoppingCatalog.Data.*;
+import shoppingCatalog.Exceptions.*;
 
 @Service
 public class MongoShoppingCatalog implements ShoppingCatalogService {
@@ -51,11 +48,24 @@ public class MongoShoppingCatalog implements ShoppingCatalogService {
 
 	@Override
 	public Mono<Product> getProductById(String productId) {
-		return this.shoppingCatalogDao.
-				findById(productId)
-				.switchIfEmpty(Mono.error(() -> new ProductIsNotExistException("Product isn't exists "+productId)))// Mono<ProductEntity>
-				.map(this::toBoundary) // Mono<Product>
-				.log(); // Mono<Product>
+		
+		Product productToCheck = new Product();
+		productToCheck.setId(productId);
+		
+		return Mono.just(productToCheck)
+				.flatMap(boundary ->{
+					if(!this.validator.isValidId(productToCheck.getId()))
+						return Mono.error(() -> new ProductIsNotExistException("Product isn't exists "+productId));
+					else {
+						return 	this.shoppingCatalogDao.
+								findById(productId)
+								.switchIfEmpty(Mono.error(() -> new ProductIsNotExistException("Product isn't exists "+productId)))// Mono<ProductEntity>
+								.map(this::toBoundary) // Mono<Product>
+								.log(); // Mono<Product>
+					}	
+				});
+				
+			
 	}
 
 	@Override
@@ -69,7 +79,7 @@ public class MongoShoppingCatalog implements ShoppingCatalogService {
 
 		rv.setId(entity.getId());
 		rv.setName(entity.getName());
-		rv.setPrice(entity.getPrice());
+		rv.setPrice(""+entity.getPrice());
 		rv.setImage(entity.getImage());
 		rv.setProductDetails(entity.getProductDetails());
 		rv.setCategory(entity.getCategory());
@@ -82,7 +92,7 @@ public class MongoShoppingCatalog implements ShoppingCatalogService {
 
 		rv.setId(boundary.getId());
 		rv.setName(boundary.getName());
-		rv.setPrice(boundary.getPrice());
+		rv.setPrice(Double.parseDouble(boundary.getPrice()));
 		rv.setImage(boundary.getImage());
 		rv.setProductDetails(boundary.getProductDetails());
 		rv.setCategory(boundary.getCategory());
@@ -91,8 +101,39 @@ public class MongoShoppingCatalog implements ShoppingCatalogService {
 	}
 	@Override
 	public Flux<Product> getSortedProducts(String filterType, String value, String sortAttribute, String order) {
-		
-		return null;
+		Product helper = new Product();
+
+		return Flux.just(helper)
+				.flatMap(boundary ->{
+					
+					if(!this.validator.isValidFilterType(filterType)) {
+						return Flux.error(() -> new InvalidFilterTypeException("Filter type must be byName/byMinPrice/byMaxPrice/byCategoryName"));}
+					else {
+						if(!this.validator.isValidSortAttribute(sortAttribute)) {
+							Flux.error(() -> new InvalidSortAttributeException("Sort Attribute must be id/name/price/image/category"));
+						}else {
+							if(!this.validator.isValidOrder(order))
+								Flux.error(() -> new InvalidOrderException("Order must be ASC/DESC"));
+						}
+						switch (filterType) {
+							case "byName":
+								
+								break;
+							case "byMinPrice":
+								
+								break;
+							case "byMaxPrice":
+								
+								break;
+							case "byCategoryName":
+								
+								break;
+						}
+					}
+					return this.shoppingCatalogDao.findAll()
+							.map(this::toBoundary)
+							.log();
+				});
 	}
 
 }

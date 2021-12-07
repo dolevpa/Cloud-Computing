@@ -38,9 +38,15 @@ public class ValidatorImplementation implements Validator {
 	}
 
 	@Override
-	public boolean isValidPrice(double price) {
-		if (price <0)
+	public boolean isValidPrice(String price) {
+		
+		try {
+			if(Double.parseDouble(price) < 0 )
+				return false;
+		} catch (Exception e) {
 			return false;
+		}
+		
 		return true;
 	}
 
@@ -48,6 +54,7 @@ public class ValidatorImplementation implements Validator {
 	public boolean isValidImage(String image) {
 		if (image == null)
 			return false;
+		
 		String regex = "([^\\s]+(\\.(?i)(jpe?g|png|gif|bmp))$)";
 		// Compile the ReGex
 		Pattern p = Pattern.compile(regex);
@@ -72,6 +79,8 @@ public class ValidatorImplementation implements Validator {
 	public boolean isValidCategory(String category) {
 		if(category==null)
 			return false;
+		if (category.isEmpty())
+			return false;
 		return true;
 	}
 
@@ -87,6 +96,44 @@ public class ValidatorImplementation implements Validator {
 					this.isValidPrice(product.getPrice())&&
 					this.isValidProductDetails(product.getProductDetails());
 		}
+	}
+
+	@Override
+	public boolean isValidFilterType(String filterType) {
+		if(filterType !=null){
+			if(		filterType.equals("byName") || 
+					filterType.equals("byMinPrice") ||
+					filterType.equals("byMaxPrice") ||
+					filterType.equals("byCategoryName"))
+				return true;
+			else
+				return false;
+		}
+		else
+			return true;
+	}
+
+
+
+	@Override
+	public boolean isValidSortAttribute(String sortAttribute) {
+		if(		sortAttribute.equals("id") || 
+				sortAttribute.equals("name") ||
+				sortAttribute.equals("price") ||
+				sortAttribute.equals("image") ||
+				sortAttribute.equals("category"))
+			return true;
+		else
+			return false;
+	}
+
+	@Override
+	public boolean isValidOrder(String order) {
+		if(		order.equals("ASC") || 
+				order.equals("DESC") )
+			return true;
+		else
+			return false;
 	}
 
 }
